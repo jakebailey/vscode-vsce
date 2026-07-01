@@ -289,7 +289,7 @@ async function _publishSignedPackage(api: GalleryApi, packageName: string, packa
 		header: `--${form.getBoundary()}${lineBreak}Content-Disposition: attachment; name=sigzip; filename=\"${sigzipName}\"${lineBreak}Content-Type: application/octet-stream${lineBreak}${lineBreak}`
 	});
 
-	const publishWithRetry = retry(handleWhen(err => err.message.includes('timeout')), {
+	const publishWithRetry = retry(handleWhen(err => err instanceof Error && err.message.includes('timeout')), {
 		maxAttempts: 3,
 		backoff: new IterableBackoff([5_000, 10_000, 20_000])
 	});

@@ -1,6 +1,5 @@
-import { promisify } from 'util';
 import * as fs from 'fs';
-import _read from 'read';
+import { read as _read, Options as ReadOptions } from 'read';
 import { WebApi, getBasicHandler } from 'azure-devops-node-api/WebApi.js';
 import { IGalleryApi, GalleryApi } from 'azure-devops-node-api/GalleryApi.js';
 import chalk from 'chalk';
@@ -9,13 +8,12 @@ import { ISecurityRolesApi } from 'azure-devops-node-api/SecurityRolesApi.js';
 import { ManifestPackage } from './manifest.js';
 import { EOL } from 'os';
 
-const __read = promisify<_read.Options, string>(_read);
-export function read(prompt: string, options: _read.Options = {}): Promise<string> {
+export function read(prompt: string, options: ReadOptions = {}): Promise<string> {
 	if (process.env['VSCE_TESTS'] || !process.stdout.isTTY) {
 		return Promise.resolve('y');
 	}
 
-	return __read({ prompt, ...options });
+	return _read({ prompt, ...options });
 }
 
 const marketplaceUrl = process.env['VSCE_MARKETPLACE_URL'] || 'https://marketplace.visualstudio.com';
