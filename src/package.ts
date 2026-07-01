@@ -8,7 +8,6 @@ import { ITranslations, patchNLS } from './nls';
 import * as util from './util';
 import { glob } from 'glob';
 import { minimatch, MinimatchOptions } from 'minimatch';
-import markdownit from 'markdown-it';
 import type { DefaultTreeAdapterMap } from 'parse5';
 import * as url from 'url';
 import mime from 'mime';
@@ -917,7 +916,10 @@ export abstract class MarkdownProcessor extends BaseProcessor {
 			}
 		}
 
-		const html = markdownit({ html: true }).render(contents);
+		// marked v18 is ESM-only, so load it via dynamic import from this CommonJS module.
+		// The rendered HTML is only used below to validate <img>/<svg> tags; it is not shipped.
+		const { marked } = await import('marked');
+		const html = await marked.parse(contents);
 
 		if (this.rewriteRelativeLinks) {
 			for (const img of await findHtmlElements(html, 'img')) {
