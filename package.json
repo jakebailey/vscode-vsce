@@ -61,7 +61,6 @@
 		"parse-semver": "^1.1.1",
 		"parse5": "^8.0.1",
 		"read": "^1.0.7",
-		"secretlint": "^10.1.2",
 		"semver": "^7.5.2",
 		"typed-rest-client": "^1.8.4",
 		"url-join": "^4.0.1",
