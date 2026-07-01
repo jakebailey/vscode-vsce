@@ -1637,7 +1637,7 @@ export async function toContentTypes(files: IFile[]): Promise<string> {
 		const ext = path.extname(file.path).toLowerCase();
 
 		if (ext) {
-			mimetypes.set(ext, mime.lookup(ext));
+			mimetypes.set(ext, mime.getType(ext) ?? 'application/octet-stream');
 		}
 	}
 
