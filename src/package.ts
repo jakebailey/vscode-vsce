@@ -9,7 +9,7 @@ import * as util from './util';
 import { glob } from 'glob';
 import { minimatch, MinimatchOptions } from 'minimatch';
 import markdownit from 'markdown-it';
-import * as cheerio from 'cheerio';
+import type { DefaultTreeAdapterMap } from 'parse5';
 import * as url from 'url';
 import mime from 'mime';
 import * as semver from 'semver';
@@ -743,6 +743,34 @@ export class TagsProcessor extends BaseProcessor {
 	}
 }
 
+async function findHtmlElements(html: string, tagName: string): Promise<DefaultTreeAdapterMap['element'][]> {
+	// parse5 v8 is ESM-only, so load it via dynamic import from this CommonJS module.
+	const { parse } = await import('parse5');
+	const elements: DefaultTreeAdapterMap['element'][] = [];
+
+	const visit = (node: DefaultTreeAdapterMap['node']): void => {
+		if ('tagName' in node && node.tagName === tagName) {
+			elements.push(node as DefaultTreeAdapterMap['element']);
+		}
+		// <template> content lives in a separate fragment, not in childNodes
+		if ('content' in node) {
+			visit(node.content);
+		}
+		if ('childNodes' in node) {
+			for (const child of node.childNodes) {
+				visit(child);
+			}
+		}
+	};
+
+	visit(parse(html));
+	return elements;
+}
+
+function getHtmlAttribute(element: DefaultTreeAdapterMap['element'], name: string): string | undefined {
+	return element.attrs.find(attr => attr.name === name)?.value;
+}
+
 export abstract class MarkdownProcessor extends BaseProcessor {
 
 	private regexp: RegExp;
@@ -890,11 +918,10 @@ export abstract class MarkdownProcessor extends BaseProcessor {
 		}
 
 		const html = markdownit({ html: true }).render(contents);
-		const $ = cheerio.load(html);
 
 		if (this.rewriteRelativeLinks) {
-			$('img').each((_, img) => {
-				const rawSrc = $(img).attr('src');
+			for (const img of await findHtmlElements(html, 'img')) {
+				const rawSrc = getHtmlAttribute(img, 'src');
 
 				if (!rawSrc) {
 					throw new Error(`Images in ${this.name} must have a source.`);
@@ -922,12 +949,12 @@ export abstract class MarkdownProcessor extends BaseProcessor {
 						`SVGs are restricted in ${this.name}; please use other file image formats, such as PNG: ${src}`
 					);
 				}
-			});
+			}
 		}
 
-		$('svg').each(() => {
+		if ((await findHtmlElements(html, 'svg')).length > 0) {
 			throw new Error(`SVG tags are not allowed in ${this.name}.`);
-		});
+		}
 
 		return {
 			path: file.path,
