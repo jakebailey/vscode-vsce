@@ -1,6 +1,6 @@
 import * as semver from 'semver';
 import parseSemver from 'parse-semver';
-import { log } from './util';
+import { log } from './util.js';
 
 const nameRegex = /^[a-z0-9][a-z0-9\-]*$/i;
 

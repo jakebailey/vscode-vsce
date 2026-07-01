@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { homedir } from 'os';
-import { read, getGalleryAPI, getSecurityRolesAPI, log, getMarketplaceUrl } from './util';
-import { validatePublisher } from './validation';
-import { readManifest } from './package';
-import { getPAT } from './publish';
+import { read, getGalleryAPI, getSecurityRolesAPI, log, getMarketplaceUrl } from './util.js';
+import { validatePublisher } from './validation.js';
+import { readManifest } from './package.js';
+import { getPAT } from './publish.js';
 
 export interface IPublisher {
 	readonly name: string;

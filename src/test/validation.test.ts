@@ -5,7 +5,7 @@ import {
 	validateVersion,
 	validateEngineCompatibility,
 	validateVSCodeTypesCompatibility,
-} from '../validation';
+} from '../validation.js';
 
 describe('validatePublisher', () => {
 	it('should throw with empty', () => {

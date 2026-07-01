@@ -1,12 +1,12 @@
-import { getPublicGalleryAPI } from './util';
+import { getPublicGalleryAPI } from './util.js';
 import {
 	ExtensionQueryFilterType,
 	ExtensionQueryFlags,
 	PublishedExtension,
 	ExtensionStatistic,
-} from 'azure-devops-node-api/interfaces/GalleryInterfaces';
-import { ratingStars, tableView, wordTrim } from './viewutils';
-import { ExtensionStatisticsMap } from './show';
+} from 'azure-devops-node-api/interfaces/GalleryInterfaces.js';
+import { ratingStars, tableView, wordTrim } from './viewutils.js';
+import { ExtensionStatisticsMap } from './show.js';
 const installationTarget = 'Microsoft.VisualStudio.Code';
 const excludeFlags = '37888'; //Value to exclude un-published, locked or hidden extensions
 

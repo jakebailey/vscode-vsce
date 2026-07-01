@@ -1,9 +1,9 @@
 import { Entry, open, ZipFile } from 'yauzl';
-import { ManifestPackage, UnverifiedManifest } from './manifest';
-import { parseXmlManifest, XMLManifest } from './xml';
+import { ManifestPackage, UnverifiedManifest } from './manifest.js';
+import { parseXmlManifest, XMLManifest } from './xml.js';
 import { Readable } from 'stream';
-import { filePathToVsixPath } from './util';
-import { validateManifestForPackaging } from './package';
+import { filePathToVsixPath } from './util.js';
+import { validateManifestForPackaging } from './package.js';
 
 async function bufferStream(stream: Readable): Promise<Buffer> {
 	return await new Promise((c, e) => {

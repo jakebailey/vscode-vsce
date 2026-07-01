@@ -1,5 +1,5 @@
-import { publish as _publish, IPublishOptions, unpublish as _unpublish, IUnpublishOptions } from './publish';
-import { packageCommand, listFiles as _listFiles, IPackageOptions } from './package';
+import { publish as _publish, IPublishOptions, unpublish as _unpublish, IUnpublishOptions } from './publish.js';
+import { packageCommand, listFiles as _listFiles, IPackageOptions } from './package.js';
 
 /**
  * @deprecated prefer IPackageOptions instead
@@ -56,7 +56,7 @@ export interface IListFilesOptions {
 	ignoreFile?: string;
 }
 
-export type { IPackageOptions } from './package';
+export type { IPackageOptions } from './package.js';
 
 /**
  * Creates a VSIX from the extension in the current working directory.
@@ -66,7 +66,7 @@ export function createVSIX(options: IPackageOptions = {}): Promise<any> {
 	return packageCommand(options);
 }
 
-export type { IPublishOptions, IUnpublishOptions } from './publish';
+export type { IPublishOptions, IUnpublishOptions } from './publish.js';
 
 /**
  * Publishes the extension in the current working directory.

@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { Convert, Location, Region, Result, Level } from "./typings/secret-lint-types";
-import { log } from "./util";
+import { Convert, Location, Region, Result, Level } from "./typings/secret-lint-types.js";
+import { log } from "./util.js";
 
 interface SecretLintEngineResult {
 	ok: boolean;
@@ -51,9 +51,8 @@ const dotEnvRules = [
 
 // Helper function to dynamically import the createEngine function
 async function getEngine(scanSecrets: boolean, scanDotEnv: boolean) {
-	// Use a raw dynamic import that will not be transformed
-	// This is necessary because @secretlint/node is an ESM module
-	const secretlintModule = await eval('import("@secretlint/node")');
+	// @secretlint/node is an ESM module; import it directly.
+	const secretlintModule = await import("@secretlint/node");
 
 	const rules = [];
 	if (scanSecrets) {

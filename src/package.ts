@@ -3,9 +3,9 @@ import * as path from 'path';
 import { promisify } from 'util';
 import * as cp from 'child_process';
 import * as yazl from 'yazl';
-import { ExtensionKind, ManifestPackage, UnverifiedManifest } from './manifest';
-import { ITranslations, patchNLS } from './nls';
-import * as util from './util';
+import { ExtensionKind, ManifestPackage, UnverifiedManifest } from './manifest.js';
+import { ITranslations, patchNLS } from './nls.js';
+import * as util from './util.js';
 import { glob } from 'glob';
 import { minimatch, MinimatchOptions } from 'minimatch';
 import type { DefaultTreeAdapterMap } from 'parse5';
@@ -21,13 +21,13 @@ import {
 	validateVSCodeTypesCompatibility,
 	validatePublisher,
 	validateExtensionDependencies,
-} from './validation';
-import { detectYarn, getDependencies } from './npm';
+} from './validation.js';
+import { detectYarn, getDependencies } from './npm.js';
 import * as GitHost from 'hosted-git-info';
 import parseSemver from 'parse-semver';
 import * as jsonc from 'jsonc-parser';
 import * as vsceSign from '@vscode/vsce-sign';
-import { getRuleNameFromRuleId, lintFiles, lintText, prettyPrintLintResult } from './secretLint';
+import { getRuleNameFromRuleId, lintFiles, lintText, prettyPrintLintResult } from './secretLint.js';
 
 const minimatchOptions: MinimatchOptions = { dot: true };
 

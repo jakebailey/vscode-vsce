@@ -1,6 +1,6 @@
-import { getPublicGalleryAPI, log } from './util';
-import { ExtensionQueryFlags, ExtensionVersion, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces';
-import { ViewTable, formatDate, formatDateTime, ratingStars, tableView, indentRow, wordWrap, icons } from './viewutils';
+import { getPublicGalleryAPI, log } from './util.js';
+import { ExtensionQueryFlags, ExtensionVersion, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces.js';
+import { ViewTable, formatDate, formatDateTime, ratingStars, tableView, indentRow, wordWrap, icons } from './viewutils.js';
 
 const limitVersions = 6;
 const isExtensionTag = /^__ext_(.*)$/;

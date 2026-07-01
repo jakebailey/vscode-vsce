@@ -1,13 +1,13 @@
-import { HttpClient, HttpClientResponse } from 'typed-rest-client/HttpClient';
+import { HttpClient, HttpClientResponse } from 'typed-rest-client/HttpClient.js';
 import {
 	PublishedExtension,
 	ExtensionQueryFlags,
 	FilterCriteria,
 	ExtensionQueryFilterType,
 	TypeInfo,
-} from 'azure-devops-node-api/interfaces/GalleryInterfaces';
-import { IHeaders } from 'azure-devops-node-api/interfaces/common/VsoBaseInterfaces';
-import { ContractSerializer } from 'azure-devops-node-api/Serialization';
+} from 'azure-devops-node-api/interfaces/GalleryInterfaces.js';
+import { IHeaders } from 'azure-devops-node-api/interfaces/common/VsoBaseInterfaces.js';
+import { ContractSerializer } from 'azure-devops-node-api/Serialization.js';
 
 export interface ExtensionQuery {
 	readonly pageNumber?: number;

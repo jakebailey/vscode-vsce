@@ -4,7 +4,6 @@ declare module 'parse-semver' {
 		readonly range: string;
 		readonly version: string;
 	}
-	module parseSemver {}
 	function parseSemver(input: string): Result;
-	export = parseSemver;
+	export default parseSemver;
 }

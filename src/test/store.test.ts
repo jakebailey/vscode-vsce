@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as tmp from 'tmp';
 import * as fs from 'fs';
-import { FileStore } from '../store';
+import { FileStore } from '../store.js';
 
 describe('FileStore', () => {
 	it('works', async () => {

@@ -15,17 +15,17 @@ import {
 	VSIX,
 	LicenseProcessor,
 	printAndValidatePackagedFiles, pack
-} from '../package';
-import { ManifestPackage } from '../manifest';
+} from '../package.js';
+import { ManifestPackage } from '../manifest.js';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as fsp from 'fs/promises';
 import * as assert from 'assert';
 import * as tmp from 'tmp';
 import { spawnSync } from 'child_process';
-import { XMLManifest, parseXmlManifest, parseContentTypes } from '../xml';
-import { flatten, log } from '../util';
-import { validatePublisher } from '../validation';
+import { XMLManifest, parseXmlManifest, parseContentTypes } from '../xml.js';
+import { flatten, log } from '../util.js';
+import { validatePublisher } from '../validation.js';
 import * as jsonc from 'jsonc-parser';
 
 // don't warn in tests

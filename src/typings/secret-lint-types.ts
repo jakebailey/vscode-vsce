@@ -1,6 +1,6 @@
 // To parse this data:
 //
-//   import { Convert, SecretLintOutput } from "./file";
+//   import { Convert, SecretLintOutput } from "./file.js";
 //
 //   const secretLintOutput = Convert.toSecretLintOutput(json);
 //

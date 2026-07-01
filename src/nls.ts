@@ -1,4 +1,4 @@
-import { ManifestPackage } from './manifest';
+import { ManifestPackage } from './manifest.js';
 
 export interface ITranslations {
 	[key: string]: string;

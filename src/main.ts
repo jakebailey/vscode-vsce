@@ -1,16 +1,17 @@
 import { Command, Option } from 'commander';
 import leven from 'leven';
-import { packageCommand, ls, Targets, generateManifest, verifySignature } from './package';
-import { publish, unpublish } from './publish';
-import { show } from './show';
-import { search } from './search';
-import { listPublishers, deletePublisher, loginPublisher, logoutPublisher, verifyPat } from './store';
-import { getLatestVersion } from './npm';
-import { CancellationToken, log } from './util';
+import { packageCommand, ls, Targets, generateManifest, verifySignature } from './package.js';
+import { publish, unpublish } from './publish.js';
+import { show } from './show.js';
+import { search } from './search.js';
+import { listPublishers, deletePublisher, loginPublisher, logoutPublisher, verifyPat } from './store.js';
+import { getLatestVersion } from './npm.js';
+import { CancellationToken, log } from './util.js';
 import * as semver from 'semver';
 import { isatty } from 'tty';
+import { readFileSync } from 'fs';
 
-const pkg = require('../package.json');
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
 function fatal(message: any, ...args: any[]): void {
 	if (message instanceof Error) {
@@ -59,7 +60,7 @@ function main(task: Promise<any>): void {
 
 const ValidTargets = [...Targets].join(', ');
 
-module.exports = function (argv: string[]): void {
+export default function (argv: string[]): void {
 	const program = new Command();
 
 	program.version(pkg.version).usage('<command>');

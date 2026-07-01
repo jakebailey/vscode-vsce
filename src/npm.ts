@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as cp from 'child_process';
 import parseSemver from 'parse-semver';
-import { CancellationToken, log, nonnull } from './util';
+import { CancellationToken, log, nonnull } from './util.js';
 
 const exists = (file: string) =>
 	fs.promises.stat(file).then(

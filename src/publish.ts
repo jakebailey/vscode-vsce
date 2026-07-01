@@ -1,19 +1,19 @@
 import * as fs from 'fs';
 import * as semver from 'semver';
-import { ExtensionQueryFlags, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces';
-import { pack, readManifest, versionBump, prepublish, signPackage, createSignatureArchive } from './package';
-import { IVerifyPatOptions, getPublisher } from './store';
-import { getGalleryAPI, read, getPublishedUrl, log, getHubUrl, patchOptionsWithManifest } from './util';
-import { ManifestPackage, ManifestPublish } from './manifest';
-import { readVSIXPackage } from './zip';
-import { validatePublisher } from './validation';
-import { GalleryApi } from 'azure-devops-node-api/GalleryApi';
+import { ExtensionQueryFlags, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces.js';
+import { pack, readManifest, versionBump, prepublish, signPackage, createSignatureArchive } from './package.js';
+import { IVerifyPatOptions, getPublisher } from './store.js';
+import { getGalleryAPI, read, getPublishedUrl, log, getHubUrl, patchOptionsWithManifest } from './util.js';
+import { ManifestPackage, ManifestPublish } from './manifest.js';
+import { readVSIXPackage } from './zip.js';
+import { validatePublisher } from './validation.js';
+import { GalleryApi } from 'azure-devops-node-api/GalleryApi.js';
 import FormData from 'form-data';
 import { basename, join } from 'path';
 import { tmpdir } from 'os';
 import { randomBytes } from 'crypto';
 import { IterableBackoff, handleWhen, retry } from 'cockatiel';
-import { getAzureCredentialAccessToken } from './auth';
+import { getAzureCredentialAccessToken } from './auth.js';
 
 function tmpName(): string {
 	return join(tmpdir(), `vsce-${randomBytes(16).toString('hex')}`);

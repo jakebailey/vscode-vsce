@@ -1,12 +1,12 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
 import _read from 'read';
-import { WebApi, getBasicHandler } from 'azure-devops-node-api/WebApi';
-import { IGalleryApi, GalleryApi } from 'azure-devops-node-api/GalleryApi';
+import { WebApi, getBasicHandler } from 'azure-devops-node-api/WebApi.js';
+import { IGalleryApi, GalleryApi } from 'azure-devops-node-api/GalleryApi.js';
 import chalk from 'chalk';
-import { PublicGalleryAPI } from './publicgalleryapi';
-import { ISecurityRolesApi } from 'azure-devops-node-api/SecurityRolesApi';
-import { ManifestPackage } from './manifest';
+import { PublicGalleryAPI } from './publicgalleryapi.js';
+import { ISecurityRolesApi } from 'azure-devops-node-api/SecurityRolesApi.js';
+import { ManifestPackage } from './manifest.js';
 import { EOL } from 'os';
 
 const __read = promisify<_read.Options, string>(_read);
