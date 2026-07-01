@@ -63,7 +63,7 @@
 		"read": "^1.0.7",
 		"semver": "^7.8.5",
 		"typed-rest-client": "^1.8.4",
-		"url-join": "^4.0.1",
+		"url-join": "^5.0.0",
 		"xml2js": "^0.6.2",
 		"yauzl": "^3.4.0",
 		"yazl": "^2.2.2"
