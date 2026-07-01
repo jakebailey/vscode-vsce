@@ -1,9 +1,7 @@
 import * as fs from 'fs';
-import { promisify } from 'util';
 import * as semver from 'semver';
 import { ExtensionQueryFlags, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces';
 import { pack, readManifest, versionBump, prepublish, signPackage, createSignatureArchive } from './package';
-import * as tmp from 'tmp';
 import { IVerifyPatOptions, getPublisher } from './store';
 import { getGalleryAPI, read, getPublishedUrl, log, getHubUrl, patchOptionsWithManifest } from './util';
 import { ManifestPackage, ManifestPublish } from './manifest';
@@ -11,11 +9,15 @@ import { readVSIXPackage } from './zip';
 import { validatePublisher } from './validation';
 import { GalleryApi } from 'azure-devops-node-api/GalleryApi';
 import FormData from 'form-data';
-import { basename } from 'path';
+import { basename, join } from 'path';
+import { tmpdir } from 'os';
+import { randomBytes } from 'crypto';
 import { IterableBackoff, handleWhen, retry } from 'cockatiel';
 import { getAzureCredentialAccessToken } from './auth';
 
-const tmpName = promisify(tmp.tmpName);
+function tmpName(): string {
+	return join(tmpdir(), `vsce-${randomBytes(16).toString('hex')}`);
+}
 
 /**
  * Options for the `publish` function.
@@ -164,14 +166,14 @@ export async function publish(options: IPublishOptions = {}): Promise<any> {
 
 		if (options.targets) {
 			for (const target of options.targets) {
-				const packagePath = await tmpName();
+				const packagePath = tmpName();
 				const packageResult = await pack({ ...options, target, packagePath });
 				const manifestValidated = validateManifestForPublishing(packageResult.manifest, options);
 				const sigzipPath = options.signTool ? await signPackage(packagePath, options.signTool) : undefined;
 				await _publish(packagePath, sigzipPath, manifestValidated, { ...options, target });
 			}
 		} else {
-			const packagePath = await tmpName();
+			const packagePath = tmpName();
 			const packageResult = await pack({ ...options, packagePath });
 			const manifestValidated = validateManifestForPublishing(packageResult.manifest, options);
 			const sigzipPath = options.signTool ? await signPackage(packagePath, options.signTool) : undefined;
