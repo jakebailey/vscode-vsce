@@ -1,14 +1,12 @@
 import * as fs from 'fs';
 import * as semver from 'semver';
-import { ExtensionQueryFlags, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces';
+import { ExtensionQueryFlags, MarketplaceAPI, PublishedExtension } from './marketplace';
 import { pack, readManifest, versionBump, prepublish, signPackage, createSignatureArchive } from './package';
 import { getPublisher } from './store';
 import { getGalleryAPI, read, getPublishedUrl, log, getHubUrl, patchOptionsWithManifest } from './util';
 import { ManifestPackage, ManifestPublish } from './manifest';
 import { readVSIXPackage } from './zip';
 import { validatePublisher } from './validation';
-import { GalleryApi } from 'azure-devops-node-api/GalleryApi';
-import FormData from 'form-data';
 import { basename, join } from 'path';
 import { tmpdir } from 'os';
 import { IterableBackoff, handleWhen, retry } from 'cockatiel';
@@ -225,13 +223,7 @@ async function _publish(packagePath: string, sigzipPath: string | undefined, man
 
 	try {
 		try {
-			extension = await api.getExtension(
-				null,
-				manifest.publisher,
-				manifest.name,
-				undefined,
-				ExtensionQueryFlags.IncludeVersions
-			);
+			extension = await api.getExtension(manifest.publisher, manifest.name, ExtensionQueryFlags.IncludeVersions);
 		} catch (err: any) {
 			if (err.statusCode !== 404) {
 				throw err;
@@ -257,7 +249,7 @@ async function _publish(packagePath: string, sigzipPath: string | undefined, man
 				await _publishSignedPackage(api, basename(packagePath), packageStream, basename(sigzipPath), fs.createReadStream(sigzipPath), manifest);
 			} else {
 				try {
-					await api.updateExtension(undefined, packageStream, manifest.publisher, manifest.name);
+					await api.updateExtension(packageStream, manifest.publisher, manifest.name);
 				} catch (err: any) {
 					if (err.statusCode === 409) {
 						if (options.skipDuplicate) {
@@ -275,7 +267,7 @@ async function _publish(packagePath: string, sigzipPath: string | undefined, man
 			if (sigzipPath) {
 				await _publishSignedPackage(api, basename(packagePath), packageStream, basename(sigzipPath), fs.createReadStream(sigzipPath), manifest);
 			} else {
-				await api.createExtension(undefined, packageStream);
+				await api.createExtension(packageStream);
 			}
 		}
 	} catch (err: any) {
@@ -295,25 +287,21 @@ async function _publish(packagePath: string, sigzipPath: string | undefined, man
 	log.done(`Published ${description}.`);
 }
 
-async function _publishSignedPackage(api: GalleryApi, packageName: string, packageStream: fs.ReadStream, sigzipName: string, sigzipStream: fs.ReadStream, manifest: ManifestPublish) {
-	const extensionType = 'Visual Studio Code';
-	const form = new FormData();
-	const lineBreak = '\r\n';
-	form.setBoundary('0f411892-ef48-488f-89d3-4f0546e84723');
-	form.append('vsix', packageStream, {
-		header: `--${form.getBoundary()}${lineBreak}Content-Disposition: attachment; name=vsix; filename=\"${packageName}\"${lineBreak}Content-Type: application/octet-stream${lineBreak}${lineBreak}`
-	});
-	form.append('sigzip', sigzipStream, {
-		header: `--${form.getBoundary()}${lineBreak}Content-Disposition: attachment; name=sigzip; filename=\"${sigzipName}\"${lineBreak}Content-Type: application/octet-stream${lineBreak}${lineBreak}`
-	});
-
+async function _publishSignedPackage(api: MarketplaceAPI, packageName: string, packageStream: fs.ReadStream, sigzipName: string, sigzipStream: fs.ReadStream, manifest: ManifestPublish) {
 	const publishWithRetry = retry(handleWhen(err => err.message.includes('timeout')), {
 		maxAttempts: 3,
 		backoff: new IterableBackoff([5_000, 10_000, 20_000])
 	});
 
 	return await publishWithRetry.execute(async () => {
-		return await api.publishExtensionWithPublisherSignature(undefined, form, manifest.publisher, manifest.name, extensionType);
+		return await api.publishExtensionWithPublisherSignature(
+			packageName,
+			packageStream,
+			sigzipName,
+			sigzipStream,
+			manifest.publisher,
+			manifest.name
+		);
 	});
 }
 

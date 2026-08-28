@@ -4,7 +4,7 @@ import {
 	ExtensionQueryFlags,
 	PublishedExtension,
 	ExtensionStatistic,
-} from 'azure-devops-node-api/interfaces/GalleryInterfaces';
+} from './marketplace';
 import { ratingStars, tableView, wordTrim } from './viewutils';
 import { ExtensionStatisticsMap } from './show';
 const installationTarget = 'Microsoft.VisualStudio.Code';

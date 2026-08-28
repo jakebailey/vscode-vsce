@@ -1,5 +1,5 @@
 import { getPublicGalleryAPI, log } from './util';
-import { ExtensionQueryFlags, ExtensionVersion, PublishedExtension } from 'azure-devops-node-api/interfaces/GalleryInterfaces';
+import { ExtensionQueryFlags, ExtensionVersion, PublishedExtension } from './marketplace';
 import { ViewTable, formatDate, formatDateTime, ratingStars, tableView, indentRow, wordWrap, icons } from './viewutils';
 
 const limitVersions = 6;

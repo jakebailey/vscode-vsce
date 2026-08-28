@@ -1,11 +1,9 @@
 import { promisify } from 'util';
 import * as fs from 'fs';
 import _read from 'read';
-import { WebApi, getBasicHandler } from 'azure-devops-node-api/WebApi';
-import { IGalleryApi, GalleryApi } from 'azure-devops-node-api/GalleryApi';
 import chalk from 'chalk';
 import { PublicGalleryAPI } from './publicgalleryapi';
-import { ISecurityRolesApi } from 'azure-devops-node-api/SecurityRolesApi';
+import { MarketplaceAPI } from './marketplace';
 import { ManifestPackage } from './manifest';
 import { EOL } from 'os';
 
@@ -32,19 +30,12 @@ export function getHubUrl(publisher: string, name: string): string {
 	return `${marketplaceUrl}/manage/publishers/${publisher}/extensions/${name}/hub`;
 }
 
-export async function getGalleryAPI(pat: string): Promise<IGalleryApi> {
-	// from https://github.com/Microsoft/tfs-cli/blob/master/app/exec/extension/default.ts#L287-L292
-	const authHandler = getBasicHandler('OAuth', pat);
-	return new GalleryApi(marketplaceUrl, [authHandler]);
-
-	// const vsoapi = new WebApi(marketplaceUrl, authHandler);
-	// return await vsoapi.getGalleryApi();
+export async function getGalleryAPI(pat: string): Promise<MarketplaceAPI> {
+	return new MarketplaceAPI(marketplaceUrl, pat);
 }
 
-export async function getSecurityRolesAPI(pat: string): Promise<ISecurityRolesApi> {
-	const authHandler = getBasicHandler('OAuth', pat);
-	const vsoapi = new WebApi(marketplaceUrl, authHandler);
-	return await vsoapi.getSecurityRolesApi();
+export async function getSecurityRolesAPI(pat: string): Promise<MarketplaceAPI> {
+	return new MarketplaceAPI(marketplaceUrl, pat);
 }
 
 export function getPublicGalleryAPI() {

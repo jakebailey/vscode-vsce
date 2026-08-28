@@ -1,13 +1,11 @@
-import { HttpClient, HttpClientResponse } from 'typed-rest-client/HttpClient';
 import {
 	PublishedExtension,
 	ExtensionQueryFlags,
 	FilterCriteria,
 	ExtensionQueryFilterType,
-	TypeInfo,
-} from 'azure-devops-node-api/interfaces/GalleryInterfaces';
-import { IHeaders } from 'azure-devops-node-api/interfaces/common/VsoBaseInterfaces';
-import { ContractSerializer } from 'azure-devops-node-api/Serialization';
+	requestMarketplace,
+	revivePublishedExtensionDates,
+} from './marketplace';
 
 export interface ExtensionQuery {
 	readonly pageNumber?: number;
@@ -22,13 +20,11 @@ interface VSCodePublishedExtension extends PublishedExtension {
 }
 
 export class PublicGalleryAPI {
-	private readonly client = new HttpClient('vsce');
-
-	constructor(private baseUrl: string, private apiVersion = '3.0-preview.1') {}
-
-	private post(url: string, data: string, additionalHeaders?: IHeaders): Promise<HttpClientResponse> {
-		return this.client.post(`${this.baseUrl}/_apis/public${url}`, data, additionalHeaders);
-	}
+	constructor(
+		private baseUrl: string,
+		private apiVersion = '3.0-preview.1',
+		private request: typeof fetch = requestMarketplace
+	) {}
 
 	async extensionQuery({
 		pageNumber = 1,
@@ -43,17 +39,33 @@ export class PublicGalleryAPI {
 			flags: flags.reduce((memo, flag) => memo | flag, 0),
 		});
 
-		const res = await this.post('/gallery/extensionquery', data, {
-			Accept: `application/json;api-version=${this.apiVersion}`,
-			'Content-Type': 'application/json',
+		const res = await this.request(`${this.baseUrl.replace(/\/$/, '')}/_apis/public/gallery/extensionquery`, {
+			method: 'POST',
+			body: data,
+			headers: {
+				Accept: `application/json;api-version=${this.apiVersion}`,
+				'Content-Type': 'application/json',
+			},
 		});
-		const raw = JSON.parse(await res.readBody());
+		const text = await res.text();
+		let raw;
+		try {
+			raw = JSON.parse(text);
+		} catch (error) {
+			if (!res.ok) {
+				throw new Error(text || res.statusText);
+			}
+			throw error;
+		}
 
 		if (raw.errorCode !== undefined) {
 			throw new Error(raw.message);
 		}
+		if (!res.ok) {
+			throw new Error(raw.message || text || res.statusText);
+		}
 
-		return ContractSerializer.deserialize(raw.results[0].extensions, TypeInfo.PublishedExtension, false, false);
+		return revivePublishedExtensionDates(raw.results[0].extensions);
 	}
 
 	async getExtension(extensionId: string, flags: ExtensionQueryFlags[] = []): Promise<PublishedExtension> {
