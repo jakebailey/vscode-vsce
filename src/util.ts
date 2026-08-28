@@ -1,6 +1,6 @@
-import { promisify } from 'util';
 import * as fs from 'fs';
-import _read from 'read';
+import { createInterface } from 'readline';
+import { Transform, TransformCallback } from 'stream';
 import { WebApi, getBasicHandler } from 'azure-devops-node-api/WebApi';
 import { IGalleryApi, GalleryApi } from 'azure-devops-node-api/GalleryApi';
 import chalk from 'chalk';
@@ -9,13 +9,96 @@ import { ISecurityRolesApi } from 'azure-devops-node-api/SecurityRolesApi';
 import { ManifestPackage } from './manifest';
 import { EOL } from 'os';
 
-const __read = promisify<_read.Options, string>(_read);
-export function read(prompt: string, options: _read.Options = {}): Promise<string> {
+interface ReadOptions {
+	silent?: boolean;
+	replace?: string;
+}
+
+class ReadOutput extends Transform {
+	muted = false;
+	private hadControl = false;
+
+	constructor(private readonly prompt: string, private readonly replace?: string) {
+		super();
+		this.pipe(process.stdout, { end: false });
+	}
+
+	get isTTY(): boolean {
+		return process.stdout.isTTY;
+	}
+
+	get columns(): number | undefined {
+		return process.stdout.columns;
+	}
+
+	get rows(): number | undefined {
+		return process.stdout.rows;
+	}
+
+	override _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback): void {
+		let value = chunk.toString();
+		if (this.muted) {
+			if (!this.replace) {
+				callback();
+				return;
+			}
+
+			if (value.startsWith('\u001b')) {
+				this.hadControl = true;
+			} else {
+				if (this.hadControl && value.startsWith(this.prompt)) {
+					this.hadControl = false;
+					this.push(this.prompt);
+					value = value.slice(this.prompt.length);
+				}
+				value = value.replace(/./g, this.replace);
+			}
+		}
+
+		this.push(value);
+		callback();
+	}
+}
+
+export function read(prompt: string, options: ReadOptions = {}): Promise<string> {
 	if (process.env['VSCE_TESTS'] || !process.stdout.isTTY) {
 		return Promise.resolve('y');
 	}
 
-	return __read({ prompt, ...options });
+	const formattedPrompt = `${prompt.trim()} `;
+	return new Promise((resolve, reject) => {
+		const output = new ReadOutput(formattedPrompt, options.replace);
+		const readline = createInterface({
+			input: process.stdin,
+			output,
+			terminal: true
+		});
+		let done = false;
+
+		const finish = (error?: Error, value?: string) => {
+			if (done) {
+				return;
+			}
+			done = true;
+			readline.close();
+			output.end();
+			error ? reject(error) : resolve(value!);
+		};
+
+		readline.once('error', finish);
+		readline.once('SIGINT', () => finish(new Error('canceled')));
+		readline.once('line', line => {
+			if (options.silent) {
+				output.muted = false;
+				output.write('\r\n');
+			}
+			finish(undefined, line.replace(/\r?\n$/, ''));
+		});
+
+		readline.setPrompt(formattedPrompt);
+		readline.prompt();
+		output.muted = options.silent ?? false;
+	});
 }
 
 const marketplaceUrl = process.env['VSCE_MARKETPLACE_URL'] || 'https://marketplace.visualstudio.com';
